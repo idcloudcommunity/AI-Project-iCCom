@@ -20,7 +20,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Login to Docker Hub
-      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
       #run: echo ${{ secrets.DOCKER_TOKEN }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
     - name: Build Docker Image
@@ -50,13 +50,13 @@ jobs:
 
           # Login to Docker Hub
           echo ${{ secrets.DOCKER_TOKEN }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          #docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          #docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
 
           # Pull Docker Image on Server
           docker pull ${{ secrets.DOCKER_USERNAME }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
           # Run Docker Container on Server
-          docker run -d --name $CONTAINER_NAME -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+          docker run -d --name $CONTAINER_NAME -p 7777:7777 ${{ secrets.DOCKER_USERNAME }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
           # Logout from Docker Hub
           docker logout
