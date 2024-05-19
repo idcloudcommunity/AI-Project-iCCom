@@ -11,7 +11,7 @@ COPY . .
 RUN npm install
 
 # Kompilasi TypeScript menjadi JavaScript
-RUN npm run build
+RUN npm build
 
 # Expose port yang digunakan aplikasi (misalnya, 3000)
 EXPOSE 3000
