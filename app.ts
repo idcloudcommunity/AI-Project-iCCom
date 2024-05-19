@@ -19,10 +19,12 @@ app.post('/food-image-recognize', getFoodName);
 app.get('/food-information-detail', getFoodInformationDetail);
 
 app.get('/', (req, res) => {
-    res.send(`Welcome to ${APP_NAME}. The server is running.`);
-    res.send(`Route lists:`);
-    res.send(`[Route 1] [POST] ${'/food-image-recognize'}`);
-    res.send(`[Route 2] [GET] ${'/food-information-detail'}`);
+    res.send(
+        `Welcome to ${APP_NAME}. The server is running.
+          Route lists:
+            [Route 1] [POST] ${'/food-image-recognize'}
+            [Route 2] [GET] ${'/food-information-detail'}`
+    );
 });
 
 app.listen(PORT, () => {
