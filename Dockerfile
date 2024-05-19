@@ -1,20 +1,20 @@
-# Gunakan image Node.js resmi sebagai basis
+# Gunakan image Node.js sebagai dasar
 FROM node:18
 
-# Buat direktori kerja di dalam container
+# Set folder kerja di dalam container
 WORKDIR /app
 
-# Salin seluruh kode sumber ke dalam container
+# Salin seluruh kode aplikasi ke folder kerja di dalam container
 COPY . .
 
-# Instal dependencies
+# Install dependensi npm
 RUN npm install
 
-# Kompilasi TypeScript menjadi JavaScript
-RUN npm build
+# Build aplikasi TypeScript
+RUN npm run build
 
-# Expose port yang digunakan aplikasi (misalnya, 3000)
-EXPOSE 3000
+# Port yang akan diexpose oleh container
+EXPOSE 7777
 
-# Perintah untuk menjalankan aplikasi
-CMD [ "node", "dist/app.js" ]
+# Perintah untuk menjalankan aplikasi saat container dijalankan
+CMD ["npm", "start"]
