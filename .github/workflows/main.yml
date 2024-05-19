@@ -1,0 +1,62 @@
+name: Docker Build, Push, and Deploy
+
+on:
+  push:
+    branches: [ backend-production ]
+  pull_request:
+    branches: [ backend-production ]
+
+env:
+  DOCKER_IMAGE_TAG: latest
+  DOCKER_IMAGE_NAME: nutrivis
+  CONTAINER_NAME: nutrivis
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Login to Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
+      #run: echo ${{ secrets.DOCKER_TOKEN }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+    - name: Build Docker Image
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .
+
+    - name: Push Docker Image
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    
+    - name: Logout from Docker Hub
+      run: docker logout
+    
+    - name: Deploy Container to Server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_SSH_PORT }}
+        envs: DOCKER_IMAGE_TAG, DOCKER_IMAGE_NAME, CONTAINER_NAME
+        script: |
+          # Check if Container Exists
+          if docker ps -a --format '{{.Names}}' | grep -Eq "^$CONTAINER_NAME$"; then
+            echo "Container $CONTAINER_NAME exists, stopping and removing..."
+            docker stop $CONTAINER_NAME
+            docker rm $CONTAINER_NAME
+          fi
+
+          # Login to Docker Hub
+          echo ${{ secrets.DOCKER_TOKEN }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          #docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
+
+          # Pull Docker Image on Server
+          docker pull ${{ secrets.DOCKER_USERNAME }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+
+          # Run Docker Container on Server
+          docker run -d --name $CONTAINER_NAME -p 7777:7777 ${{ secrets.DOCKER_USERNAME }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+
+          # Logout from Docker Hub
+          docker logout
