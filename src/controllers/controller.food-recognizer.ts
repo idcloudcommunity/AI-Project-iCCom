@@ -5,10 +5,13 @@ const controllerFoodRecognizer = {
   getFoodName: async (request: Request, response: Response) => {
     // Pastikan request body memiliki properti 'imageData' yang berisi data gambar dalam format base64
     // Pastikan request body memiliki properti 'imageUrl' yang berisi URL gambar
-    const { imageUrl } = request.body;
+    const { imageUrl, foodWeight = request.body.foodWeight ? request.body.foodWeight : 100 } = request.body;
 
     try {
-      const finalResult = await foodRecognizerServices(imageUrl);    
+      const finalResult = await foodRecognizerServices(imageUrl, foodWeight);    
+
+      console.log("foodSummary", finalResult);
+
       // Tanggapi hasil pengenalan gambar
       response.status(200).json(finalResult);
     } catch (error) {

@@ -10,7 +10,7 @@ import { CLAUDEAI_API_KEY, CLAUDEAI_PROMPT } from '../helpers/helper.environment
 // Inisialisasi client Anthropics
 const anthropic = new Anthropic({ apiKey: `${CLAUDEAI_API_KEY}` });
 
-const foodRecognizerServices = async (imageUrl: any) => {
+const foodRecognizerServices = async (imageUrl: any, foodWeight: number) => {
   // Unduh gambar dari URL menggunakan Axios
   const recognizedFood = await axios
     .get(imageUrl, { responseType: 'arraybuffer', timeout: 10000 })
@@ -52,17 +52,27 @@ const foodRecognizerServices = async (imageUrl: any) => {
     .then(async (finalResult: any) => {
       let foodSummary: any = {};
 
-      console.log(
-        'makanan terdeteksi',
-        finalResult.content[0].text.toLowerCase()
-      );
       const nutrition = await foodInformationDetailService(
         finalResult.content[0].text.toLowerCase()
       );
 
+      const nutritionCalculated = {
+        namaBahanMakanan: nutrition[0]["name"],
+        kalori_kkal: ((nutrition[0]["calories"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["calories"]/100) * foodWeight) : ((nutrition[0]["calories"]/100) * foodWeight).toFixed(2) ,
+        protein_gram: ((nutrition[0]["protein_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["protein_g"]/100) * foodWeight) : ((nutrition[0]["protein_g"]/100) * foodWeight).toFixed(2),
+        serat_gram: ((nutrition[0]["fiber_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["fiber_g"]/100) * foodWeight) : ((nutrition[0]["fiber_g"]/100) * foodWeight).toFixed(2),
+        gula_gram: ((nutrition[0]["sugar_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["sugar_g"]/100) * foodWeight) : ((nutrition[0]["sugar_g"]/100) * foodWeight).toFixed(2),
+        karbohidratTotal_gram: ((nutrition[0]["carbohydrates_total_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["carbohydrates_total_g"]/100) * foodWeight) : ((nutrition[0]["carbohydrates_total_g"]/100) * foodWeight).toFixed(2),
+        lemakTotal_gram: ((nutrition[0]["fat_total_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["fat_total_g"]/100) * foodWeight) : ((nutrition[0]["fat_total_g"]/100) * foodWeight).toFixed(2),
+        lemakJenuh_gram: ((nutrition[0]["fat_saturated_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["fat_saturated_g"]/100) * foodWeight) : ((nutrition[0]["fat_saturated_g"]/100) * foodWeight).toFixed(2),
+        kolesterol_miligram: ((nutrition[0]["cholesterol_mg"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["cholesterol_mg"]/100) * foodWeight) : ((nutrition[0]["cholesterol_mg"]/100) * foodWeight).toFixed(2),
+        sodium_miligram: ((nutrition[0]["sodium_mg"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["sodium_mg"]/100) * foodWeight) : ((nutrition[0]["sodium_mg"]/100) * foodWeight).toFixed(2),
+        potassium_miligram: ((nutrition[0]["potassium_mg"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["potassium_mg"]/100) * foodWeight) : ((nutrition[0]["potassium_mg"]/100) * foodWeight).toFixed(2),
+      }
+
       return (foodSummary = {
         foodnName: finalResult.content[0].text.toLowerCase(),
-        nutrition,
+        nutrition: nutritionCalculated,
       });
     })
     .catch((error: any) => {
