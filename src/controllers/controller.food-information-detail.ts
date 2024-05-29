@@ -15,6 +15,7 @@ const controllerFoodInformationDetail = {
         const query: String = nutrition.foodName || 'tofu and tempeh';
 
       const finalResult = await foodInformationDetailService(query);
+
       // Send the response from the API to the client
       response.status(200).json(finalResult);
     } catch (error: any) {

@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 
 // Import environment variables
 import { PORT, APP_NAME } from './src/helpers/helper.environment';
@@ -8,6 +9,15 @@ import controllerFoodRecognizer from './src/controllers/controller.food-recogniz
 import controllerFoodInformationDetail from './src/controllers/controller.food-information-detail';
 
 const app = express();
+
+// CORS configuration
+const corsOptions = {
+    origin: '*', // Allow all origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow common methods
+    allowedHeaders: ['Content-Type', 'Authorization'] // Allow common headers
+};
+
+app.use(cors(corsOptions));
 
 // Middleware to parse request bodies as JSON
 app.use(express.json());
