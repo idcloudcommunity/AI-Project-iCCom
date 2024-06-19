@@ -11,9 +11,6 @@ COPY . .
 # Install dependensi npm
 RUN npm install
 
-# Build aplikasi TypeScript
-RUN npm run build
-
 # Port yang akan diexpose oleh container
 EXPOSE 7777
 
