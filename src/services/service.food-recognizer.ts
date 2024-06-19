@@ -52,27 +52,49 @@ const foodRecognizerServices = async (imageUrl: any, foodWeight: number) => {
     .then(async (finalResult: any) => {
       let foodSummary: any = {};
 
-      const nutrition = await foodInformationDetailService(
-        finalResult.content[0].text.toLowerCase()
+      const nutritions = await foodInformationDetailService(
+        finalResult.content[0].text.toLowerCase().split(' - ')[0]
       );
 
-      const nutritionCalculated = {
-        namaBahanMakanan: nutrition[0]["name"],
-        kalori_kkal: ((nutrition[0]["calories"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["calories"]/100) * foodWeight) : ((nutrition[0]["calories"]/100) * foodWeight).toFixed(2) ,
-        protein_gram: ((nutrition[0]["protein_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["protein_g"]/100) * foodWeight) : ((nutrition[0]["protein_g"]/100) * foodWeight).toFixed(2),
-        serat_gram: ((nutrition[0]["fiber_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["fiber_g"]/100) * foodWeight) : ((nutrition[0]["fiber_g"]/100) * foodWeight).toFixed(2),
-        gula_gram: ((nutrition[0]["sugar_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["sugar_g"]/100) * foodWeight) : ((nutrition[0]["sugar_g"]/100) * foodWeight).toFixed(2),
-        karbohidratTotal_gram: ((nutrition[0]["carbohydrates_total_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["carbohydrates_total_g"]/100) * foodWeight) : ((nutrition[0]["carbohydrates_total_g"]/100) * foodWeight).toFixed(2),
-        lemakTotal_gram: ((nutrition[0]["fat_total_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["fat_total_g"]/100) * foodWeight) : ((nutrition[0]["fat_total_g"]/100) * foodWeight).toFixed(2),
-        lemakJenuh_gram: ((nutrition[0]["fat_saturated_g"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["fat_saturated_g"]/100) * foodWeight) : ((nutrition[0]["fat_saturated_g"]/100) * foodWeight).toFixed(2),
-        kolesterol_miligram: ((nutrition[0]["cholesterol_mg"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["cholesterol_mg"]/100) * foodWeight) : ((nutrition[0]["cholesterol_mg"]/100) * foodWeight).toFixed(2),
-        sodium_miligram: ((nutrition[0]["sodium_mg"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["sodium_mg"]/100) * foodWeight) : ((nutrition[0]["sodium_mg"]/100) * foodWeight).toFixed(2),
-        potassium_miligram: ((nutrition[0]["potassium_mg"]/100) * foodWeight).toFixed(2).toString().split(".")[1] === "00" ? ((nutrition[0]["potassium_mg"]/100) * foodWeight) : ((nutrition[0]["potassium_mg"]/100) * foodWeight).toFixed(2),
-      }
+      const modifiedNutritionArrayOfObject = nutritions.map((nutrition: any, indexNutritionKeysOfObject: number)=>{
+
+        const modifiedFoodObjectKeys = [
+          'nama_bahan_makanan',
+          'kalori_kkal',
+          'protein_gr',
+          'serat_gr',
+          'gula_gr',
+          'karbohidrat_total_gr',
+          'lemak_total_gr',
+          'lemak_jenuh_gr',
+          'kolesterol_mg',
+          'sodium_mg',
+          'potassium_mg'
+        ]
+
+        const nutritionKeys = Object.keys(nutrition).map((nutritionKey: any)=>{
+          return nutritionKey
+        }) 
+        
+        const modifiedFoodObject = modifiedFoodObjectKeys.reduce((acc, modifiedFoodObjectKey, indexModifiedFoodObject) => {
+
+          const nameOfEachFood = finalResult.content[0].text.toLowerCase().split(' - ')[1].split(' dan ')[indexNutritionKeysOfObject] 
+          const nutritionValue = (nutritions[indexNutritionKeysOfObject][`${nutritionKeys[indexModifiedFoodObject]}`]/100) * foodWeight
+
+          return {
+            ...acc,
+            [modifiedFoodObjectKey]:nutritionKeys[indexModifiedFoodObject] === 'name' ? nameOfEachFood : parseFloat(nutritionValue.toFixed(1))
+          };
+        }, {});
+
+        return modifiedFoodObject
+
+      })
 
       return (foodSummary = {
-        foodnName: finalResult.content[0].text.toLowerCase(),
-        nutrition: nutritionCalculated,
+        makanan_terdeteksi: finalResult.content[0].text.toLowerCase().split(' - ')[1],
+        berat_tiap_makanan: `${foodWeight} gram`,
+        rincian_gizi: modifiedNutritionArrayOfObject,
       });
     })
     .catch((error: any) => {
