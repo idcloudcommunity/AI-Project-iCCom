@@ -1,4 +1,4 @@
-# Gunakan image Node.js sebagai dasar a
+# Gunakan image Node.js sebagai dasar ab
 
 FROM node:18
 
