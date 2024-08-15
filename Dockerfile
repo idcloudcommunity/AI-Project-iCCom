@@ -1,4 +1,4 @@
-# Gunakan image Node.js sebagai dasar abcd
+# Gunakan image Node.js sebagai dasar abcde
 
 FROM node:18
 
